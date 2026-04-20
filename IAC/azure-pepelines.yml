@@ -1,0 +1,37 @@
+trigger:
+- main   # pipeline runs when you push to main branch
+
+# Use your self-hosted agent pool
+pool:
+  name: SelfHosted   # replace with the exact pool name you created
+
+steps:
+# Checkout the repo so .tf files are available
+- checkout: self
+
+# Optional: check Terraform is installed
+- script: terraform version
+  displayName: 'Check Terraform version'
+  workingDirectory: '$(Build.SourcesDirectory)'
+
+# Initialize Terraform
+- script: terraform init
+  displayName: 'Terraform Init'
+  workingDirectory: '$(Build.SourcesDirectory)'
+
+# Validate Terraform configuration
+- script: terraform validate
+  displayName: 'Terraform Validate'
+  workingDirectory: '$(Build.SourcesDirectory)'
+
+# Plan Terraform deployment
+- script: terraform plan -out=tfplan
+  displayName: 'Terraform Plan'
+  workingDirectory: '$(Build.SourcesDirectory)'
+
+# Apply Terraform deployment
+- script: terraform apply -auto-approve tfplan
+  displayName: 'Terraform Apply'
+  workingDirectory: '$(Build.SourcesDirectory)'
+
+
